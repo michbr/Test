@@ -45,11 +45,16 @@ void ARoboEyes::BeginPlay()
 }
 
 // Called every frame
-void ARoboEyes::Tick( float DeltaTime )
-{
+void ARoboEyes::Tick( float DeltaTime ) {
 	Super::Tick( DeltaTime );
-	seconds += DeltaTime;
-	if (seconds > 2) {
+	//seconds += DeltaTime;
+	if (canSeePlayer()) {
+		cone->SetMaterial(0, green);
+	}
+	else {
+		cone->SetMaterial(0, red);
+	}
+	/*if (seconds > 2) {
 		if (isGreen) {
 			cone->SetMaterial(0, red);
 			isGreen = false;
@@ -59,6 +64,25 @@ void ARoboEyes::Tick( float DeltaTime )
 			isGreen = true;
 		}
 		seconds = 0;
-	}
+	}*/
+}
+
+bool ARoboEyes::canSeePlayer() {
+	UWorld * world = GetWorld();
+	FVector dir = world->GetFirstPlayerController()->GetCharacter()->GetActorLocation();// GetActorLocation();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Red, FString::SanitizeFloat(dir.X));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Green, FString::SanitizeFloat(dir.Y));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0, FColor::Blue, FString::SanitizeFloat(dir.Z));
+
+	FHitResult hit;
+	world->LineTraceSingle(hit, this->GetActorLocation(), dir, FCollisionQueryParams(true), 
+		FCollisionObjectQueryParams(
+			ECC_TO_BITFIELD(ECollisionChannel::ECC_Pawn) 
+			| ECC_TO_BITFIELD(ECollisionChannel::ECC_Visibility) 
+			| ECC_TO_BITFIELD(ECollisionChannel::ECC_WorldStatic)
+			| ECC_TO_BITFIELD(ECollisionChannel::ECC_WorldDynamic)
+			| ECC_TO_BITFIELD(ECollisionChannel::ECC_PhysicsBody)));
+	
+	return hit.GetActor() == world->GetFirstPlayerController()->GetCharacter();
 }
 

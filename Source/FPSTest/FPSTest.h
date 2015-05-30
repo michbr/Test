@@ -3,7 +3,6 @@
 #ifndef __FPSTEST_H__
 #define __FPSTEST_H__
 
-#include "EngineMinimal.h"
-
+#include "Engine.h"
 
 #endif
