@@ -2,37 +2,28 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "AbstractRobotComponent.h"
 #include "RoboEyes.generated.h"
 
-UCLASS()
-class FPSTEST_API ARoboEyes : public AActor
-{
+/**
+*
+*/
+UCLASS(ClassGroup = RobotComponents, meta = (BlueprintSpawnableComponent))
+//UCLASS()
+class FPSTEST_API URoboEyes : public UAbstractRobotComponent {
 	GENERATED_BODY()
 
-		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class UStaticMeshComponent* cone;
+	bool isGreen;
 
-		bool isGreen;
+	float seconds;
 
-		float seconds;
+	UMaterial * red;
+	UMaterial * green;
+public:
+	URoboEyes();
 
-		UMaterial * red;
-		UMaterial * green;
-
-	
-public:	
-	// Sets default values for this actor's properties
-	ARoboEyes();
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool canSeePlayer();
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
-
-	
-	
 };
