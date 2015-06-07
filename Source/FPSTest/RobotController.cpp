@@ -2,8 +2,6 @@
 
 #include "FPSTest.h"
 #include "RobotController.h"
-#include "RoboEyes3.h"
-#include "RobotAntenna3.h"
 
 using namespace std;
 // Sets default values
