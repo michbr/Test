@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <list>
+#include <unordered_map>
+
+#include "PointOfInterest.h"
 #include "AbstractRobotComponent.h"
 #include "RoboEyes.generated.h"
 
@@ -13,17 +17,19 @@ UCLASS(ClassGroup = RobotComponents, meta = (BlueprintSpawnableComponent))
 class FPSTEST_API URoboEyes : public UAbstractRobotComponent {
 	GENERATED_BODY()
 
-	bool isGreen;
+	bool playerSighted;
+	std::list<UPointOfInterest *> targets;
+	std::unordered_map<UPointOfInterest *, bool> targetMap;
 
-	float seconds;
-
-	UMaterial * red;
-	UMaterial * green;
 public:
 	URoboEyes();
 
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void InitializeComponent() override;
 
-	bool canSeePlayer();
+	bool canSeeTarget(UPointOfInterest * target);
+
+	UFUNCTION()
+		void OnSeePawn(APawn *OtherPawn);
 
 };

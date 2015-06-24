@@ -4,6 +4,8 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "RobotController.h"
+#include "RobotMessage.h"
+#include <string>
 #include "AbstractRobotComponent.generated.h"
 
 /**
@@ -18,4 +20,5 @@ public:
 	//UAbstractRobotComponent3(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	UAbstractRobotComponent();
 	virtual void InitializeComponent() override;
+	virtual void onMessage(RobotMessage message);
 };

@@ -2,12 +2,19 @@
 
 #pragma once
 
-#include "GameFramework/Pawn.h"
+#include "Event.h"
+#include "RobotMentalModel.h"
+#include "RobotMessage.h"
+
 #include <list>
+#include <vector>
+
+#include "GameFramework/Pawn.h"
+#include "Runtime/AIModule/Classes/Perception/PawnSensingComponent.h"
+
 #include "RobotController.generated.h"
 
-class URoboEyes3;
-class URobotAntenna3;
+class UAbstractRobotComponent;
 
 UCLASS()
 class FPSTEST_API ARobotController : public APawn {
@@ -16,19 +23,18 @@ class FPSTEST_API ARobotController : public APawn {
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		class UStaticMeshComponent * sphere;
 
-	//UPROPERTY(VisibleAnywhere, Category = RoboComponents)
-	//	URoboEyes3 * eyes;
+	std::list<RobotMessage> messageQueue;
 
-	//UPROPERTY(VisibleAnywhere, Category = RoboComponents)
-	//	URobotAntenna3 * antenna;
-
-	std::list<std::string> messageQueue;
+	std::vector<UAbstractRobotComponent *> messageListeners;
+	UPawnSensingComponent * sense;
 
 	UMaterial * red;
 	UMaterial * green;
 
+	ControllerMentalModel mentalModel;
+
 public:
-	// Sets default values for this pawn's propertiesx
+	// Sets default values for this pawn's properties
 	ARobotController();
 
 	// Called when the game starts or when spawned
@@ -40,5 +46,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
-	void submitMessage(std::string message);
+	void PostInitializeComponents() override;
+
+	void submitMessage(RobotMessage message);
+
+	void registerListener(UAbstractRobotComponent * component);
+
+	void attachMentalModel(ControllerMentalModel * model);
+
+	UFUNCTION()
+		void OnSeePawn(APawn *OtherPawn);
+
+private:
+	ControllerMentalModel * getMentalModel();
+
+	void broadcastEvent(Event e);
 };

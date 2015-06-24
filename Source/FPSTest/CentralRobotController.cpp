@@ -3,6 +3,8 @@
 #include "FPSTest.h"
 #include "CentralRobotController.h"
 
+#include "RobotAntenna.h"
+
 using namespace std;
 
 // Sets default values
@@ -27,6 +29,20 @@ ACentralRobotController::ACentralRobotController()
 void ACentralRobotController::BeginPlay()
 {
 	Super::BeginPlay();
+	for (int i = 0; i < robots.Num(); i++) {
+		TArray<URobotAntenna*> Comps;
+		robots[i]->GetComponents(Comps);
+		UE_LOG(LogTemp, Warning, TEXT("checking for antenna..."));
+		if (Comps.Num() > 0) {
+			UE_LOG(LogTemp, Warning, TEXT("...antenna found!!!"));
+			URobotAntenna* FoundComp = Comps[0];
+			//FoundComp->registerListener(this);
+			FoundComp->attachMentalModel(&mentalModel);
+			listeners.push_back(FoundComp);
+
+			//do stuff with FoundComp
+		}
+	}
 	
 }
 
@@ -37,9 +53,12 @@ void ACentralRobotController::Tick( float DeltaTime )
 
 }
 
-void ACentralRobotController::broadcastMessage(string message) {
-	for (int i = 0; i < robots.Num(); i++) {
-		robots[i]->submitMessage(message);
+void ACentralRobotController::broadcastMessage(RobotMessage message) {
+	for (int i = 0; i < listeners.size(); i++) {
+		//robots[i]->submitMessage(message);
+		UE_LOG(LogTemp, Warning, TEXT("CRC: broadcasting message...."));
+
+		//listeners[i]->onRecieveBroadcast(message);
 	}
 }
 
