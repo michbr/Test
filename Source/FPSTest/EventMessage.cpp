@@ -3,10 +3,26 @@
 #include "FPSTest.h"
 #include "EventMessage.h"
 
-EventMessage::EventMessage()
-{
+using namespace std;
+
+EventMessage::EventMessage(string messageType, UPointOfInterest * target) {
+	type = messageType;
+	targetInfo = target;
 }
 
-EventMessage::~EventMessage()
-{
+EventMessage::~EventMessage() {
 }
+
+string EventMessage::getType() {
+	return type;
+}
+
+void EventMessage::setType(string messageType) {
+	type = messageType;
+}
+
+
+UPointOfInterest * EventMessage::getTargetInfo() const {
+	return targetInfo;
+}
+

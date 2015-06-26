@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "EventMessage.h"
+#include "ModelUpdateListener.h"
 #include "ControllerMentalModel.h"
 #include "GameFramework/Actor.h"
 #include "RobotController.h"
@@ -12,8 +14,7 @@
 class URobotAntenna;
 
 UCLASS()
-class FPSTEST_API ACentralRobotController : public AActor
-{
+class FPSTEST_API ACentralRobotController : public AActor, public ModelUpdateListener {
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -22,7 +23,7 @@ class FPSTEST_API ACentralRobotController : public AActor
 	UPROPERTY(EditInstanceOnly, Category = Robots)
 		TArray<ARobotController *> robots;
 	
-	std::vector<URobotAntenna *> listeners;
+	std::vector<ARobotController *> listeners;
 
 	ControllerMentalModel mentalModel;
 
@@ -36,7 +37,9 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	void broadcastMessage(RobotMessage message);
-	
-	
+	void broadcastMessage(EventMessage message);
+
+	void notifySighting(UPointOfInterest * target) override;
+	void notifySightingLost(UPointOfInterest * target) override;
+		
 };

@@ -23,6 +23,8 @@ ACentralRobotController::ACentralRobotController()
 
 	sphere->SetStaticMesh(SphereVisualAsset.Object);
 
+	mentalModel.addUpdateListener(this);
+
 }
 
 // Called when the game starts or when spawned
@@ -32,15 +34,12 @@ void ACentralRobotController::BeginPlay()
 	for (int i = 0; i < robots.Num(); i++) {
 		TArray<URobotAntenna*> Comps;
 		robots[i]->GetComponents(Comps);
-		UE_LOG(LogTemp, Warning, TEXT("checking for antenna..."));
+		//UE_LOG(LogTemp, Warning, TEXT("checking for antenna..."));
 		if (Comps.Num() > 0) {
-			UE_LOG(LogTemp, Warning, TEXT("...antenna found!!!"));
+			//UE_LOG(LogTemp, Warning, TEXT("...antenna found!!!"));
 			URobotAntenna* FoundComp = Comps[0];
-			//FoundComp->registerListener(this);
 			FoundComp->attachMentalModel(&mentalModel);
-			listeners.push_back(FoundComp);
-
-			//do stuff with FoundComp
+			listeners.push_back(robots[i]);
 		}
 	}
 	
@@ -53,12 +52,25 @@ void ACentralRobotController::Tick( float DeltaTime )
 
 }
 
-void ACentralRobotController::broadcastMessage(RobotMessage message) {
+void ACentralRobotController::broadcastMessage(EventMessage message) {
 	for (int i = 0; i < listeners.size(); i++) {
 		//robots[i]->submitMessage(message);
-		UE_LOG(LogTemp, Warning, TEXT("CRC: broadcasting message...."));
+		//UE_LOG(LogTemp, Warning, TEXT("CRC: broadcasting message...."));
 
-		//listeners[i]->onRecieveBroadcast(message);
+		listeners[i]->submitEvent(message);
 	}
+}
+
+void ACentralRobotController::notifySighting(UPointOfInterest * target) {
+	//TODO send sighting found event message to robot controller
+	EventMessage message("target found", target);
+	broadcastMessage(message);
+
+}
+
+void ACentralRobotController::notifySightingLost(UPointOfInterest * target) {
+	//TODO send sighting lost event message to robot controller
+	EventMessage message("target lost", target);
+	broadcastMessage(message);
 }
 

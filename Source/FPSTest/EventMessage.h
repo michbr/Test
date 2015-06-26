@@ -2,12 +2,23 @@
 
 #pragma once
 
+#include "PointOfInterest.h"
+#include <string>
+
 /**
  * 
  */
-class FPSTEST_API EventMessage
-{
+class FPSTEST_API EventMessage {
+
+	std::string type;
+	UPointOfInterest * targetInfo;
+
 public:
 	EventMessage();
+	EventMessage(std::string messageType, UPointOfInterest * target);
 	~EventMessage();
+
+	std::string getType();
+	void setType(std::string messageType);
+	UPointOfInterest * getTargetInfo() const;
 };

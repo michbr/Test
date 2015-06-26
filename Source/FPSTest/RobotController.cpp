@@ -24,11 +24,8 @@ ARobotController::ARobotController() {
 	green = Material_Green.Object;
 
 	sense = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("Senses"));
-}
 
-void ARobotController::OnSeePawn(APawn *OtherPawn) {
-	UE_LOG(LogTemp, Warning, TEXT("Vision info received"));
-
+	hasExternalMentalModel = false;
 }
 
 void ARobotController::PostInitializeComponents() {
@@ -49,15 +46,15 @@ void ARobotController::Tick( float DeltaTime ) {
 
 		RobotMessage message = messageQueue.front();
 		messageQueue.pop_front();
-		UE_LOG(LogTemp, Warning, TEXT("CONTROLLER: processing message - %s, %s, %s"), UTF8_TO_TCHAR(message.getSource().c_str()), UTF8_TO_TCHAR(message.getType().c_str()), *message.getTargetInfo()->getTargetType());
+	//	UE_LOG(LogTemp, Warning, TEXT("CONTROLLER: processing message - %s, %s, %s"), UTF8_TO_TCHAR(message.getSource().c_str()), UTF8_TO_TCHAR(message.getType().c_str()), *message.getTargetInfo()->getTargetType());
 
 		//UE_LOG(LogTemp, Warning, TEXT("*********  %s  *********"), UTF8_TO_TCHAR(message.getType().c_str()));
 
 		for (int i = 0; i < messageListeners.size(); i++) {
-			UE_LOG(LogTemp, Warning, TEXT("Transmitting message from source %s"), UTF8_TO_TCHAR(message.getSource().c_str()));
+			//UE_LOG(LogTemp, Warning, TEXT("Transmitting message from source %s"), UTF8_TO_TCHAR(message.getSource().c_str()));
 
 			if (message.getSource().compare("antenna") != 0) {
-				UE_LOG(LogTemp, Warning, TEXT("Transmitting message type %s"), UTF8_TO_TCHAR(message.getType().c_str()));
+			//	UE_LOG(LogTemp, Warning, TEXT("Transmitting message type %s"), UTF8_TO_TCHAR(message.getType().c_str()));
 
 				messageListeners[i]->onMessage(message);
 			}
@@ -67,19 +64,19 @@ void ARobotController::Tick( float DeltaTime ) {
 			&& message.getType().compare("player sighted") == 0
 			&& message.getTargetInfo()->getTargetType().Compare("player") == 0) {
 
-			mentalModel.addSighting(message.getTargetInfo());
+			sightingFound(message.getTargetInfo());
 			//UE_LOG(LogTemp, Warning, TEXT("CONTROLLER: set material to green"));
 
-			sphere->SetMaterial(0, green);
+			//sphere->SetMaterial(0, green);
 			
 		}
 		else if (message.getSource().compare("eyes") == 0 
 			&& message.getType().compare("player lost") == 0 
 			&& message.getTargetInfo()->getTargetType().Compare("player") == 0) {
-			mentalModel.removeSighting(message.getTargetInfo());
+			sightingLost(message.getTargetInfo());
 			//UE_LOG(LogTemp, Warning, TEXT("CONTROLLER: set material to red"));
 
-			sphere->SetMaterial(0, red);
+			//sphere->SetMaterial(0, red);
 		}
 	}
 
@@ -104,10 +101,54 @@ void ARobotController::submitMessage(RobotMessage message) {
 	messageQueue.push_back(message);
 }
 
+void ARobotController::submitEvent(EventMessage message) {
+	//UE_LOG(LogTemp, Warning, TEXT("CONTROLLER: got event %s with target type %s"), UTF8_TO_TCHAR(message.getType().c_str()), *message.getTargetInfo()->getTargetType());
+
+	if (message.getType().compare("target found") == 0 && message.getTargetInfo()->getTargetType().Compare("player") == 0) {
+		sphere->SetMaterial(0, green);
+	}
+	else if (message.getType().compare("target lost") == 0 && message.getTargetInfo()->getTargetType().Compare("player") == 0) {
+		sphere->SetMaterial(0, red);
+
+	}
+}
+
+
 void ARobotController::registerListener(UAbstractRobotComponent * component) {
 	messageListeners.push_back(component);
 }
 
 void ARobotController::attachMentalModel(ControllerMentalModel * model) {
+	//UE_LOG(LogTemp, Warning, TEXT("CONTROLLER: external mental model attached"));
 
+	hasExternalMentalModel = true;
+	externalMentalModel = model;
+}
+
+void ARobotController::detachMentalModel() {
+	hasExternalMentalModel = false;
+	externalMentalModel = NULL;	
+}
+
+ControllerMentalModel * ARobotController::getMentalModel() {
+	if (hasExternalMentalModel) {
+		return externalMentalModel;
+	}
+	else {
+		return &mentalModel;
+	}
+}
+
+void ARobotController::sightingFound(UPointOfInterest * sighting) {
+	if (hasExternalMentalModel) {
+		externalMentalModel->addSighting(sighting);
+	}
+	mentalModel.addSighting(sighting);
+}
+
+void ARobotController::sightingLost(UPointOfInterest * sighting) {
+	if (hasExternalMentalModel) {
+		externalMentalModel->removeSighting(sighting);
+	}
+	mentalModel.removeSighting(sighting);
 }

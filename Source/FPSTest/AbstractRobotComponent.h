@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Components/StaticMeshComponent.h"
 #include "RobotController.h"
 #include "RobotMessage.h"
 #include <string>

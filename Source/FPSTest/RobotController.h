@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "Event.h"
-#include "RobotMentalModel.h"
+#include "ControllerMentalModel.h"
 #include "RobotMessage.h"
+#include "EventMessage.h"
 
 #include <list>
 #include <vector>
@@ -32,7 +32,12 @@ class FPSTEST_API ARobotController : public APawn {
 	UMaterial * green;
 
 	ControllerMentalModel mentalModel;
+	ControllerMentalModel * externalMentalModel;
+	bool hasExternalMentalModel;
 
+
+	void sightingLost(UPointOfInterest * sighting);
+	void sightingFound(UPointOfInterest * sighting);
 public:
 	// Sets default values for this pawn's properties
 	ARobotController();
@@ -49,16 +54,13 @@ public:
 	void PostInitializeComponents() override;
 
 	void submitMessage(RobotMessage message);
+	void submitEvent(EventMessage message);
 
 	void registerListener(UAbstractRobotComponent * component);
 
 	void attachMentalModel(ControllerMentalModel * model);
-
-	UFUNCTION()
-		void OnSeePawn(APawn *OtherPawn);
+	void detachMentalModel();
 
 private:
 	ControllerMentalModel * getMentalModel();
-
-	void broadcastEvent(Event e);
 };

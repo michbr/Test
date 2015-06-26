@@ -24,7 +24,7 @@ void URoboEyes::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 		if (canSeeTarget((*iterator))) {
 			if (targetMap.count((*iterator)) < 0 || !targetMap[(*iterator)]) {
 				targetMap[(*iterator)] = true;
-				UE_LOG(LogTemp, Warning, TEXT("EYES: target sighted - %s"), *(*iterator)->getTargetType());
+			//	UE_LOG(LogTemp, Warning, TEXT("EYES: target sighted - %s"), *(*iterator)->getTargetType());
 
 				RobotMessage message("eyes", "player sighted", *iterator);
 				componentController->submitMessage(message);
@@ -110,12 +110,12 @@ void URoboEyes::InitializeComponent() {
 }
 
 void URoboEyes::OnSeePawn(APawn *OtherPawn) {
-	UE_LOG(LogTemp, Warning, TEXT("EYES: Vision info received"));
+	//UE_LOG(LogTemp, Warning, TEXT("EYES: Vision info received"));
 	TArray<UPointOfInterest*> Comps;
 	OtherPawn->GetComponents(Comps);
-	UE_LOG(LogTemp, Warning, TEXT("EYES: checking for UPointOfInterest..."));
+	//UE_LOG(LogTemp, Warning, TEXT("EYES: checking for UPointOfInterest..."));
 	if (Comps.Num() > 0) {
-		UE_LOG(LogTemp, Warning, TEXT("...UPointOfInterest found!!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("...UPointOfInterest found!!!"));
 		UPointOfInterest * FoundComp = Comps[0];
 		//UTargetInfo2 * info = FoundComp->getTargetInfo();
 		if (targetMap.count(FoundComp) == 0 || !targetMap[FoundComp]) {
